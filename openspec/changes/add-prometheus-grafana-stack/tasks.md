@@ -20,7 +20,7 @@
 
 ## 4. Sample data and import file format
 
-- [ ] 4.1 Generate `examples/sample.om`: 2–3 gauge series with labels, one day in early 2024 at 5-minute steps, grouped by metric and series, timestamps ascending, ending with `# EOF`; verify `promtool tsdb create-blocks-from openmetrics examples/sample.om <tmpdir>` (inside the image) succeeds
+- [x] 4.1 Generate `examples/sample.om`: 2–3 gauge series with labels, one day in early 2024 at 5-minute steps, grouped by metric and series, timestamps ascending, ending with `# EOF`; verify `promtool tsdb create-blocks-from openmetrics examples/sample.om <tmpdir>` (inside the image) succeeds
 - [ ] 4.2 Create `grafana/dashboards/sample.json` with panels for the sample series, using datasource UID `prometheus` and a fixed time range matching the sample; verify the dashboard appears in Grafana's `/api/search` after restart
 - [ ] 4.3 Write the README section "Import file format" (OpenMetrics syntax, seconds timestamps, `# EOF`, ordering, naming, label/cardinality guidance, lookback note) and verify its example snippet passes promtool when saved as a file
 
