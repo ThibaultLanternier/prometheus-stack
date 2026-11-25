@@ -26,7 +26,7 @@
 
 ## 5. Importer
 
-- [ ] 5.1 Implement the validation pre-pass in `scripts/import.sh` (D3: EOF check, ms/far-future timestamp check), and verify by hand that it rejects a file without `# EOF` and a file with ms timestamps and accepts `examples/sample.om`
+- [x] 5.1 Implement the validation pre-pass in `scripts/import.sh` (D3: EOF check, ms/far-future timestamp check), and verify by hand that it rejects a file without `# EOF` and a file with ms timestamps and accepts `examples/sample.om`
 - [ ] 5.2 Implement the import loop (D4/D5: clean leftover staging, run promtool into `.staging/<run-id>`, chown to 65534, atomic `mv` into `/prometheus`, move file to `processed/` or `failed/`, print errors, keep going, "nothing to import" message, non-zero exit if any file failed)
 - [ ] 5.3 Add the `importer` service (profile `import`, same image tag, `user: "0:0"`, D2 mounts); verify `docker compose up -d` does not start it and `docker compose run --rm importer` with `examples/sample.om` copied into `import/` moves the file to `processed/`
 - [ ] 5.4 Verify the queryable bound: within 2 minutes of 5.3, `curl 'localhost:9090/api/v1/query?query=<sample_metric>&time=<sample_ts>'` returns the sample value without restarting Prometheus, and the sample dashboard shows the data. If not, apply the D-risk fallback (print a restart hint) and document it
