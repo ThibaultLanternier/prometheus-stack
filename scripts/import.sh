@@ -42,13 +42,75 @@ validate() {
     ' "$1"
 }
 
-status=0
-for f in "$@"; do
-    if reason=$(validate "$f"); then
-        echo "OK      $f"
-    else
-        echo "INVALID $f: $reason"
-        status=1
+IMPORT_DIR=${IMPORT_DIR:-/import}
+DATA_DIR=${DATA_DIR:-/prometheus}
+STAGING="$DATA_DIR/.staging"   # not a ULID: Prometheus ignores it
+PROM_OWNER=65534:65534         # "nobody", the user the server runs as
+
+# archive FILE DEST_DIR
+# Moves FILE into DEST_DIR without overwriting an earlier file of the same name.
+archive() {
+    name=$(basename "$1")
+    target="$2/$name"
+    [ -e "$target" ] && target="$2/$(date +%Y%m%dT%H%M%S)-$name"
+    mv "$1" "$target"
+}
+
+# import_file FILE RUN_DIR
+# Converts FILE into blocks under RUN_DIR, then hands them to Prometheus.
+# Each block appears in DATA_DIR through a rename within the same volume,
+# so Prometheus never sees a half-written block.
+import_file() {
+    validate "$1" || return 1
+    promtool tsdb create-blocks-from openmetrics "$1" "$2" >/dev/null || return 1
+    chown -R "$PROM_OWNER" "$2" || return 1
+    for block in "$2"/*/; do
+        [ -d "$block" ] || continue
+        mv "${block%/}" "$DATA_DIR/" || return 1
+    done
+}
+
+# Leftovers from an interrupted run were never exposed: just drop them.
+rm -rf "$STAGING"
+mkdir -p "$STAGING"
+
+# processed/ and failed/ belong to the owner of the import folder (the host user).
+owner=$(stat -c %u:%g "$IMPORT_DIR")
+for d in processed failed; do
+    if [ ! -d "$IMPORT_DIR/$d" ]; then
+        mkdir -p "$IMPORT_DIR/$d" && chown "$owner" "$IMPORT_DIR/$d"
     fi
 done
-exit "$status"
+
+found=0
+imported=0
+failed=0
+for f in "$IMPORT_DIR"/*.om; do
+    [ -f "$f" ] || continue
+    found=$((found + 1))
+    run="$STAGING/run-$$-$found"
+    echo "Importing $(basename "$f")..."
+    if err=$(import_file "$f" "$run" 2>&1); then
+        archive "$f" "$IMPORT_DIR/processed"
+        imported=$((imported + 1))
+        echo "  ok -> processed/"
+    else
+        archive "$f" "$IMPORT_DIR/failed"
+        failed=$((failed + 1))
+        echo "  FAILED -> failed/" >&2
+        printf '%s\n' "$err" | sed 's/^/    /' >&2
+    fi
+    rm -rf "$run"
+done
+rm -rf "$STAGING"
+
+if [ "$found" -eq 0 ]; then
+    echo "Nothing to import: no .om files in $IMPORT_DIR."
+    exit 0
+fi
+
+echo "Done: $imported imported, $failed failed."
+if [ "$imported" -gt 0 ]; then
+    echo "Imported data becomes queryable within about a minute."
+fi
+[ "$failed" -eq 0 ]
