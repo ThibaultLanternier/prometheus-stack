@@ -41,7 +41,7 @@
 - [x] 3.3 Configure `loki.write` retries for at least 5 minutes, then verify the outage scenarios:
   - **short outage:** stop Loki, add a file, start Loki within 5 minutes, and the file's transactions become queryable;
   - **full re-ingestion:** the D4 re-ingestion command leaves every transaction count unchanged.
-- [ ] 3.4 Verify the restart and duplicate scenarios:
+- [x] 3.4 Verify the restart and duplicate scenarios:
   - after `docker compose down && docker compose up -d`, Alloy's positions survive, so no file is re-read (the `loki_source_file_read_lines_total` delta is 0) and counts are unchanged;
   - copying an ingested file under a new name leaves counts unchanged;
   - lines appended to an ingested file are ingested within 60 s.
