@@ -5,3 +5,6 @@
 import/*.om
 import/processed/*.om
 import/failed/*.om
+
+# Smoke test scratch folders
+.smoke.*/
