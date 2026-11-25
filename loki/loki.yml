@@ -48,9 +48,17 @@ limits_config:
   retention_period: ${LOKI_RETENTION:-10y}
   max_query_length: 0
   max_query_lookback: 0
+  # Loki splits each query into 1h sub-queries by default: a multi-year query
+  # becomes tens of thousands of them and times out. With a few thousand
+  # transactions, a single query is fast.
+  split_queries_by_interval: 0
   max_entries_limit_per_query: 50000
   allow_structured_metadata: true
   volume_enabled: true
+  # Keep exactly the labels the sender sets (job, account, type): Loki
+  # otherwise adds a service_name label and a detected_level field.
+  discover_service_name: []
+  discover_log_levels: false
 
 compactor:
   working_directory: /loki/compactor

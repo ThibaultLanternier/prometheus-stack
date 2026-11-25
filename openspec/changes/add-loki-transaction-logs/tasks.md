@@ -13,7 +13,7 @@
   - `curl -s localhost:3100/ready` returns `ready` within 60 s of `docker compose up -d`;
   - `ss -ltn` shows `127.0.0.1:3100` only;
   - `/config` reports the `LOKI_RETENTION` value from `.env` and `10y` without it.
-- [ ] 2.3 Spike, before wiring Alloy: use `curl` against `/loki/api/v1/push` and `/loki/api/v1/query_range` to verify that:
+- [x] 2.3 Spike, before wiring Alloy: use `curl` against `/loki/api/v1/push` and `/loki/api/v1/query_range` to verify that:
   - entries dated 2 years ago are accepted;
   - 2023 entries pushed after 2025 entries of the same stream are accepted, including after `docker compose restart loki`;
   - re-pushing identical entries, including after `POST /flush`, leaves query counts unchanged;

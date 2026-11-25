@@ -73,6 +73,23 @@ The compactor has `retention_enabled: true` and `delete_request_store: filesyste
 - Adding a time-based label: it breaks the three-label contract.
 - Requiring chronological ingestion: it forbids backfilling older history later.
 
+**Spike results (task 2.3, Loki 3.7.10)**
+
+All checks pass. They needed two settings that were not in the original plan:
+
+| Check | Result |
+| --- | --- |
+| Entries dated 2 years ago | accepted |
+| 2023 entries pushed after 2025 entries of the same stream | accepted |
+| 2022 entry pushed after `restart loki`, into a stream whose newest entry is 2025 | accepted |
+| Re-pushing 7 identical entries after `POST /flush`, and after a restart | count unchanged (7) |
+| Same timestamp, different line | both kept |
+| Push with a valid entry and one 3 days ahead | HTTP 400 "timestamp too new" for the future entry. The valid one is stored, and `loki_discarded_samples_total{reason="too_far_in_future"}` is 1 |
+| 4-year `query_range` | **initially timed out after about 60 s**. It takes 0.4 s with `split_queries_by_interval: 0` |
+| Labels of a pushed stream | **Loki added `service_name`**. It is exactly `job`, `account`, `type` with `discover_service_name: []` |
+
+Both settings were added to `limits_config`, along with `discover_log_levels: false`, which stops Loki from adding a detected level to every line.
+
 ### D3. No container healthchecks for Loki and Alloy
 Neither image provides an HTTP client: Loki has no shell, and Alloy has `sh` but neither `wget` nor `curl`. So:
 - `loki` and `alloy` have no compose `healthcheck`;
