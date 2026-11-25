@@ -41,7 +41,7 @@
 
 ## 7. Lint
 
-- [ ] 7.1 Run `shellcheck` (via the `koalaman/shellcheck` image) on `scripts/*.sh`, `docker compose config -q`, and `promtool check config`; fix all findings and verify that all three pass cleanly and the smoke test still passes
+- [x] 7.1 Run `shellcheck` (via the `koalaman/shellcheck` image) on `scripts/*.sh`, `docker compose config -q`, and `promtool check config`; fix all findings and verify that all three pass cleanly and the smoke test still passes
 
 ## Workflow follow-up
 
