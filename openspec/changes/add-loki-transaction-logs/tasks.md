@@ -2,8 +2,8 @@
 
 ## 1. Scaffolding
 
-- [ ] 1.1 Create `import-transactions/` (with `.gitkeep`), `loki/` and `alloy/`; verify `ls -RA` shows every path
-- [ ] 1.2 Extend `.gitignore` with `import-transactions/*.jsonl`, and `.env.example` with `LOKI_PORT`, `ALLOY_PORT`, `LOKI_RETENTION` and `IMPORT_TRANSACTIONS_DIR` (D9); verify `git check-ignore import-transactions/x.jsonl` lists the path
+- [x] 1.1 Create `import-transactions/` (with `.gitkeep`), `loki/` and `alloy/`; verify `ls -RA` shows every path
+- [x] 1.2 Extend `.gitignore` with `import-transactions/*.jsonl`, and `.env.example` with `LOKI_PORT`, `ALLOY_PORT`, `LOKI_RETENTION` and `IMPORT_TRANSACTIONS_DIR` (D9); verify `git check-ignore import-transactions/x.jsonl` lists the path
 
 ## 2. Loki service
 

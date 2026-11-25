@@ -8,3 +8,6 @@ import/failed/*.om
 
 # Smoke test scratch folders
 .smoke.*/
+
+# Transaction drop zone: user data files are never committed
+import-transactions/*.jsonl
