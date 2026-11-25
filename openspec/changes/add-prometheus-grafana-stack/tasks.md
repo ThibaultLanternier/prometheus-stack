@@ -14,9 +14,9 @@
 
 ## 3. Grafana service and provisioning
 
-- [ ] 3.1 Write the datasource provisioning file (`uid: prometheus`, default, `http://prometheus:9090`) and the dashboard provider file
-- [ ] 3.2 Add the `grafana` service (pinned tag, admin credentials from `.env`, `grafana-data` volume, provisioning mounts, loopback port, healthcheck, `depends_on` prometheus healthy); verify `docker compose up -d` brings both services to healthy
-- [ ] 3.3 Verify provisioning: `curl -su admin:<pw> localhost:3000/api/datasources/uid/prometheus/health` returns status OK, and the configured admin password is accepted
+- [x] 3.1 Write the datasource provisioning file (`uid: prometheus`, default, `http://prometheus:9090`) and the dashboard provider file
+- [x] 3.2 Add the `grafana` service (pinned tag, admin credentials from `.env`, `grafana-data` volume, provisioning mounts, loopback port, healthcheck, `depends_on` prometheus healthy); verify `docker compose up -d` brings both services to healthy
+- [x] 3.3 Verify provisioning: `curl -su admin:<pw> localhost:3000/api/datasources/uid/prometheus/health` returns status OK, and the configured admin password is accepted
 
 ## 4. Sample data and import file format
 
