@@ -7,7 +7,7 @@
 
 ## 2. Prometheus service
 
-- [ ] 2.1 Write `prometheus/prometheus.yml` (self-scrape only) and verify `docker run --rm --entrypoint promtool -v $PWD/prometheus:/p prom/prometheus:<tag> check config /p/prometheus.yml` succeeds
+- [x] 2.1 Write `prometheus/prometheus.yml` (self-scrape only) and verify `docker run --rm --entrypoint promtool -v $PWD/prometheus:/p prom/prometheus:<tag> check config /p/prometheus.yml` succeeds
 - [ ] 2.2 Add the `prometheus` service to `docker-compose.yml` (pinned tag, D6 flags, `prometheus-data` volume, loopback-bound port, readiness healthcheck); verify `docker compose config -q` passes and, after `docker compose up -d prometheus`, `curl -s localhost:9090/-/ready` returns ready
 - [ ] 2.3 Verify the env wiring: with `PROMETHEUS_RETENTION=30d` in `.env`, `curl -s localhost:9090/api/v1/status/runtimeinfo` reports a 30d retention, and with no `.env` it reports 10y
 - [ ] 2.4 Verify loopback-only exposure: `ss -ltnp | grep 9090` shows `127.0.0.1:9090`, not `0.0.0.0`
