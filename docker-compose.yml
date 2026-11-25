@@ -45,6 +45,18 @@ services:
       prometheus:
         condition: service_healthy
 
+  # On-demand backfill job: `docker compose run --rm importer`.
+  # The profile keeps it out of `docker compose up`.
+  importer:
+    image: prom/prometheus:v3.16.0
+    profiles: [import]
+    user: "0:0"
+    entrypoint: ["/bin/sh", "/scripts/import.sh"]
+    volumes:
+      - prometheus-data:/prometheus
+      - ${IMPORT_DIR:-./import}:/import
+      - ./scripts:/scripts:ro
+
 volumes:
   prometheus-data:
   grafana-data:
