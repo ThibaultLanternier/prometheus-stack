@@ -1,0 +1,7 @@
+# Local configuration (may contain secrets)
+.env
+
+# Import drop zone: user data files are never committed
+import/*.om
+import/processed/*.om
+import/failed/*.om

@@ -2,8 +2,8 @@
 
 ## 1. Project scaffolding
 
-- [ ] 1.1 Create the D1 directory layout with `.gitkeep` files in `import/`, `import/processed/` and `import/failed/`, and verify `ls -R` shows every expected path
-- [ ] 1.2 Add `.gitignore` (ignoring `.env`, `import/*.om`, `import/processed/*.om`, `import/failed/*.om`) and `.env.example` with every variable from D1/D6/D8 set to its default or a placeholder; verify `git check-ignore .env import/x.om` lists both paths
+- [x] 1.1 Create the D1 directory layout with `.gitkeep` files in `import/`, `import/processed/` and `import/failed/`, and verify `ls -R` shows every expected path
+- [x] 1.2 Add `.gitignore` (ignoring `.env`, `import/*.om`, `import/processed/*.om`, `import/failed/*.om`) and `.env.example` with every variable from D1/D6/D8 set to its default or a placeholder; verify `git check-ignore .env import/x.om` lists both paths
 
 ## 2. Prometheus service
 
