@@ -21,7 +21,7 @@
   - a 3-year `query_range` succeeds.
 
   Record the results in design.md. If any check fails, stop and revisit D2 or the spec with the user.
-- [ ] 2.4 Verify persistence: after pushing an entry, `docker compose down && docker compose up -d` keeps it queryable, and `docker compose down -v` removes it
+- [x] 2.4 Verify persistence: after pushing an entry, `docker compose down && docker compose up -d` keeps it queryable, and `docker compose down -v` removes it
 
 ## 3. Alloy ingestion
 
