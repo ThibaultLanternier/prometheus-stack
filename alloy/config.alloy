@@ -1,0 +1,55 @@
+// Transaction ingestion: every *.jsonl file in /import is read line by line
+// and shipped to Loki. Alloy remembers how far it read each file (positions
+// in --storage.path), so files are read once.
+
+local.file_match "transactions" {
+  path_targets = [{"__path__" = "/import/*.jsonl"}]
+  sync_period  = "10s"
+}
+
+loki.source.file "transactions" {
+  targets       = local.file_match.transactions.targets
+  forward_to    = [loki.process.transactions.receiver]
+  tail_from_end = false
+}
+
+loki.process "transactions" {
+  forward_to = [loki.write.loki.receiver]
+
+  stage.json {
+    expressions = {
+      date    = "",
+      account = "",
+      type    = "",
+    }
+  }
+
+  stage.timestamp {
+    source           = "date"
+    format           = "2006-01-02"
+    fallback_formats = ["RFC3339Nano", "RFC3339"]
+  }
+
+  stage.static_labels {
+    values = {
+      job = "transactions",
+    }
+  }
+
+  stage.labels {
+    values = {
+      account = "",
+      type    = "",
+    }
+  }
+
+  stage.label_drop {
+    values = ["filename"]
+  }
+}
+
+loki.write "loki" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

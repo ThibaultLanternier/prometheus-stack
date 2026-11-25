@@ -61,6 +61,27 @@ services:
     ports:
       - "127.0.0.1:${LOKI_PORT:-3100}:3100"
 
+  # Transaction ingestion: watches the import folder and ships every .jsonl
+  # line to Loki. No healthcheck (no HTTP client in the image): readiness is
+  # http://localhost:12345/-/ready.
+  alloy:
+    image: grafana/alloy:v1.22.0
+    restart: unless-stopped
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=0.0.0.0:12345
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ${IMPORT_TRANSACTIONS_DIR:-./import-transactions}:/import:ro
+      - alloy-data:/var/lib/alloy/data
+    ports:
+      - "127.0.0.1:${ALLOY_PORT:-12345}:12345"
+    depends_on:
+      loki:
+        condition: service_started
+
   # On-demand backfill job: `docker compose run --rm importer`.
   # The profile keeps it out of `docker compose up`.
   importer:
@@ -77,3 +98,4 @@ volumes:
   prometheus-data:
   grafana-data:
   loki-data:
+  alloy-data:
