@@ -1,0 +1,40 @@
+{"id":"2025-001","date":"2025-01-01","account":"courant","type":"TRANSFER","amount":2450.00,"description":"VIREMENT SALAIRE ACME SAS"}
+{"id":"2025-002","date":"2025-01-02","account":"courant","type":"DIRECT_DEBIT","amount":-850.00,"description":"PRLV LOYER AGENCE DU CENTRE"}
+{"id":"2025-003","date":"2025-01-05","account":"courant","type":"CARD","amount":-65.55,"description":"CB SUPERMARCHE DU QUARTIER PARIS"}
+{"id":"2025-004","date":"2025-01-08","account":"courant","type":"DIRECT_DEBIT","amount":-39.99,"description":"PRLV FREE MOBILE"}
+{"id":"2025-005","date":"2025-01-10","account":"courant","type":"CARD","amount":-12.50,"description":"CB BOULANGERIE DES LILAS"}
+{"id":"2025-006","date":"2025-01-12","account":"courant","type":"TRANSFER","amount":-200.00,"description":"VIREMENT VERS LIVRET JOINT"}
+{"id":"2025-007","date":"2025-01-12","account":"livret_joint","type":"TRANSFER","amount":200.00,"description":"VIREMENT DEPUIS COMPTE COURANT"}
+{"id":"2025-008","date":"2025-01-15","account":"courant","type":"CARD","amount":-47.15,"description":"CB SUPERMARCHE BIO MARCHE"}
+{"id":"2025-009","date":"2025-01-20","account":"courant","type":"CARD","amount":-18.90,"description":"CB PHARMACIE CENTRALE"}
+{"id":"2025-010","date":"2025-01-22","account":"courant","type":"DIRECT_DEBIT","amount":-64.20,"description":"PRLV EDF ELECTRICITE"}
+{"id":"2025-011","date":"2025-01-26","account":"courant","type":"CARD","amount":-34.75,"description":"CB SUPERMARCHE DU QUARTIER PARIS"}
+{"id":"2025-012","date":"2025-01-28","account":"courant","type":"WITHDRAWAL","amount":-60.00,"description":"RETRAIT DAB PARIS 11"}
+{"id":"2025-013","date":"2025-02-01","account":"courant","type":"TRANSFER","amount":2450.00,"description":"VIREMENT SALAIRE ACME SAS"}
+{"id":"2025-014","date":"2025-02-02","account":"courant","type":"DIRECT_DEBIT","amount":-850.00,"description":"PRLV LOYER AGENCE DU CENTRE"}
+{"id":"2025-015","date":"2025-02-05","account":"courant","type":"CARD","amount":-68.70,"description":"CB SUPERMARCHE DU QUARTIER PARIS"}
+{"id":"2025-016","date":"2025-02-08","account":"courant","type":"DIRECT_DEBIT","amount":-39.99,"description":"PRLV FREE MOBILE"}
+{"id":"2025-017","date":"2025-02-10","account":"courant","type":"CARD","amount":-12.50,"description":"CB BOULANGERIE DES LILAS"}
+{"id":"2025-018","date":"2025-02-12","account":"courant","type":"TRANSFER","amount":-200.00,"description":"VIREMENT VERS LIVRET JOINT"}
+{"id":"2025-019","date":"2025-02-12","account":"livret_joint","type":"TRANSFER","amount":200.00,"description":"VIREMENT DEPUIS COMPTE COURANT"}
+{"id":"2025-037","date":"2025-02-14","account":"courant","type":"CARD","amount":-4.50,"description":"CB CAFE DE LA GARE"}
+{"id":"2025-038","date":"2025-02-14","account":"courant","type":"CARD","amount":-4.50,"description":"CB CAFE DE LA GARE"}
+{"id":"2025-020","date":"2025-02-15","account":"courant","type":"CARD","amount":-49.20,"description":"CB SUPERMARCHE BIO MARCHE"}
+{"id":"2025-021","date":"2025-02-20","account":"courant","type":"CARD","amount":-18.90,"description":"CB PHARMACIE CENTRALE"}
+{"id":"2025-022","date":"2025-02-22","account":"courant","type":"DIRECT_DEBIT","amount":-64.20,"description":"PRLV EDF ELECTRICITE"}
+{"id":"2025-023","date":"2025-02-26","account":"courant","type":"CARD","amount":-35.75,"description":"CB SUPERMARCHE DU QUARTIER PARIS"}
+{"id":"2025-024","date":"2025-02-28","account":"courant","type":"WITHDRAWAL","amount":-60.00,"description":"RETRAIT DAB PARIS 11"}
+{"id":"2025-025","date":"2025-03-01","account":"courant","type":"TRANSFER","amount":2450.00,"description":"VIREMENT SALAIRE ACME SAS"}
+{"id":"2025-026","date":"2025-03-02","account":"courant","type":"DIRECT_DEBIT","amount":-850.00,"description":"PRLV LOYER AGENCE DU CENTRE"}
+{"id":"2025-027","date":"2025-03-05","account":"courant","type":"CARD","amount":-71.85,"description":"CB SUPERMARCHE DU QUARTIER PARIS"}
+{"id":"2025-028","date":"2025-03-08","account":"courant","type":"DIRECT_DEBIT","amount":-39.99,"description":"PRLV FREE MOBILE"}
+{"id":"2025-029","date":"2025-03-10","account":"courant","type":"CARD","amount":-12.50,"description":"CB BOULANGERIE DES LILAS"}
+{"id":"2025-030","date":"2025-03-12","account":"courant","type":"TRANSFER","amount":-200.00,"description":"VIREMENT VERS LIVRET JOINT"}
+{"id":"2025-031","date":"2025-03-12","account":"livret_joint","type":"TRANSFER","amount":200.00,"description":"VIREMENT DEPUIS COMPTE COURANT"}
+{"id":"2025-032","date":"2025-03-15","account":"courant","type":"CARD","amount":-51.25,"description":"CB SUPERMARCHE BIO MARCHE"}
+{"id":"2025-039","date":"2025-03-18T19:42:00+01:00","account":"courant","type":"CARD","amount":-27.80,"description":"CB RESTAURANT LE PETIT ZINC","currency":"EUR"}
+{"id":"2025-033","date":"2025-03-20","account":"courant","type":"CARD","amount":-18.90,"description":"CB PHARMACIE CENTRALE"}
+{"id":"2025-034","date":"2025-03-22","account":"courant","type":"DIRECT_DEBIT","amount":-64.20,"description":"PRLV EDF ELECTRICITE"}
+{"id":"2025-035","date":"2025-03-26","account":"courant","type":"CARD","amount":-36.75,"description":"CB SUPERMARCHE DU QUARTIER PARIS"}
+{"id":"2025-036","date":"2025-03-28","account":"courant","type":"WITHDRAWAL","amount":-60.00,"description":"RETRAIT DAB PARIS 11"}
+{"id":"2025-040","date":"2025-03-31","account":"livret_joint","type":"INTEREST","amount":3.42,"description":"INTERETS CREDITEURS"}
