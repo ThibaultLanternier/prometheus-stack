@@ -45,6 +45,22 @@ services:
       prometheus:
         condition: service_healthy
 
+  # Transaction storage. The image has no shell or HTTP client, so there is no
+  # healthcheck: readiness is http://localhost:3100/ready.
+  loki:
+    image: grafana/loki:3.7.10
+    restart: unless-stopped
+    command:
+      - -config.file=/etc/loki/loki.yml
+      - -config.expand-env=true
+    environment:
+      LOKI_RETENTION: ${LOKI_RETENTION:-10y}
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml:ro
+      - loki-data:/loki
+    ports:
+      - "127.0.0.1:${LOKI_PORT:-3100}:3100"
+
   # On-demand backfill job: `docker compose run --rm importer`.
   # The profile keeps it out of `docker compose up`.
   importer:
@@ -60,3 +76,4 @@ services:
 volumes:
   prometheus-data:
   grafana-data:
+  loki-data:

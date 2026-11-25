@@ -8,7 +8,7 @@
 ## 2. Loki service
 
 - [x] 2.1 Write `loki/loki.yml` per D2 and verify `docker run --rm -v $PWD/loki:/etc/loki:ro grafana/loki:3.7.10 -config.file=/etc/loki/loki.yml -config.expand-env=true -verify-config` succeeds
-- [ ] 2.2 Add the `loki` service to `docker-compose.yml` (pinned tag, expand-env flag, `loki-data` volume, `127.0.0.1:${LOKI_PORT:-3100}` port, no healthcheck per D3). Verify:
+- [x] 2.2 Add the `loki` service to `docker-compose.yml` (pinned tag, expand-env flag, `loki-data` volume, `127.0.0.1:${LOKI_PORT:-3100}` port, no healthcheck per D3). Verify:
   - `docker compose config -q` passes;
   - `curl -s localhost:3100/ready` returns `ready` within 60 s of `docker compose up -d`;
   - `ss -ltn` shows `127.0.0.1:3100` only;
