@@ -38,7 +38,7 @@
   - no `tx_*` or `filename` label reaches Loki (`/loki/api/v1/labels`).
 
   If a rule cannot be expressed with stock stages, stop and revisit D5 with the user.
-- [ ] 3.3 Configure `loki.write` retries for at least 5 minutes, then verify the outage scenarios:
+- [x] 3.3 Configure `loki.write` retries for at least 5 minutes, then verify the outage scenarios:
   - **short outage:** stop Loki, add a file, start Loki within 5 minutes, and the file's transactions become queryable;
   - **full re-ingestion:** the D4 re-ingestion command leaves every transaction count unchanged.
 - [ ] 3.4 Verify the restart and duplicate scenarios:
