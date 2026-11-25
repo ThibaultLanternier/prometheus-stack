@@ -55,7 +55,7 @@
   - it appears in `/api/search`;
   - its logs query, run through `/api/ds/query` with `account=courant` and `search=supermarche`, returns only the matching sample lines;
   - its dropped-lines query returns the reasons produced in 3.2 while the dashboard range is January 2025.
-- [ ] 4.5 Write the README sections:
+- [x] 4.5 Write the README sections:
   - **"Transactions: file format":** fields, date rules, label rules, `id` and byte-identical duplicate detection, privacy note, "write elsewhere then move" advice;
   - **"Ingesting transactions":** the watched folder, the dropped-lines panel, readiness URLs, the re-ingestion command, and restarting Prometheus and Grafana on upgrade;
   - updates to "Quick start", "Configuration" and "Resetting" for Loki and Alloy.
