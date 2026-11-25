@@ -90,6 +90,8 @@ All checks pass. They needed two settings that were not in the original plan:
 
 Both settings were added to `limits_config`, along with `discover_log_levels: false`, which stops Loki from adding a detected level to every line.
 
+The smoke test (task 5.1) later found that the instant metric query `count_over_time(...[3650d])` returned nothing, and 1000 days took 21 s. Loki splits instant metric queries and label lookups by their own intervals (`split_instant_metric_queries_by_interval: 1h`, `split_metadata_queries_by_interval`). Both are set to `0` too. A 10-year count now takes 0.6 s, and 10-year label values take 0.09 s.
+
 ### D3. No container healthchecks for Loki and Alloy
 Neither image provides an HTTP client: Loki has no shell, and Alloy has `sh` but neither `wget` nor `curl`. So:
 - `loki` and `alloy` have no compose `healthcheck`;

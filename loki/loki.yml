@@ -52,6 +52,10 @@ limits_config:
   # becomes tens of thousands of them and times out. With a few thousand
   # transactions, a single query is fast.
   split_queries_by_interval: 0
+  # Same for instant metric queries such as count_over_time(...[3y]), and for
+  # label lookups (dashboard filters) over long ranges.
+  split_instant_metric_queries_by_interval: 0
+  split_metadata_queries_by_interval: 0
   max_entries_limit_per_query: 50000
   allow_structured_metadata: true
   volume_enabled: true
