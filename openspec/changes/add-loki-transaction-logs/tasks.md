@@ -51,7 +51,7 @@
 - [x] 4.1 Add the `loki` and `alloy` scrape jobs to `prometheus/prometheus.yml`; verify `promtool check config` passes and, after `docker compose restart prometheus`, `/api/v1/targets` shows both targets up
 - [x] 4.2 Write `examples/transactions.jsonl` per D8 (about 40 made-up transactions, Jan–Mar 2025); verify that within 60 s of copying it into `import-transactions/`, `sum(count_over_time({job="transactions"}[90d]))` at 2025-04-01 equals `wc -l examples/transactions.jsonl`
 - [x] 4.3 Add the Loki datasource to `grafana/provisioning/datasources/prometheus.yml` (D7: `uid: loki`, `maxLines: 5000`, not the default); verify after `docker compose restart grafana` that `curl -su admin:<pw> localhost:3000/api/datasources/uid/loki/health` reports OK and that Prometheus is still the default
-- [ ] 4.4 Create `grafana/dashboards/transactions.json` per D6 and D7 (account, type and search variables; Logs panel with `line_format`; Dropped-lines panel with relative time `7d`; UTC; sample time range). Verify:
+- [x] 4.4 Create `grafana/dashboards/transactions.json` per D6 and D7 (account, type and search variables; Logs panel with `line_format`; Dropped-lines panel with relative time `7d`; UTC; sample time range). Verify:
   - it appears in `/api/search`;
   - its logs query, run through `/api/ds/query` with `account=courant` and `search=supermarche`, returns only the matching sample lines;
   - its dropped-lines query returns the reasons produced in 3.2 while the dashboard range is January 2025.

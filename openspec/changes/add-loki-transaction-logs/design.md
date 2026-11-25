@@ -167,12 +167,12 @@ The line is never rewritten. It reaches Loki byte for byte as it is in the file,
 ### D6. Observability of drops
 `prometheus/prometheus.yml` gains two scrape jobs: `loki` (`loki:3100`) and `alloy` (`alloy:12345`).
 
-The Transactions dashboard has a **Dropped lines (last 7 days)** bar gauge on the Prometheus datasource, with a panel-level relative time `7d` so it ignores the dashboard's transaction-date range. Its query:
+The Transactions dashboard has a **Dropped lines (last 7 days)** bar gauge on the Prometheus datasource, with a panel-level relative time `7d` so it ignores the dashboard's transaction-date range. It has one instant query per source (`M` is `loki_process_dropped_lines_total{component_id="loki.process.transactions"}`, then `loki_discarded_samples_total{tenant="fake"}`):
 ```promql
-sum by (reason) (increase(loki_process_dropped_lines_total{component_id="loki.process.transactions"}[$__range]))
-  or
-sum by (reason) (increase(loki_discarded_samples_total[$__range]))
+clamp_min(sum by (reason) (M - M offset $__range), 0) or sum by (reason) (M)
 ```
+
+*Why not `increase()`:* Alloy and Loki create a counter series for a reason only at its first drop. Prometheus's first sample of that series already holds the count, so `increase()` reports 0 for exactly the drops we want to show. The query takes the difference over the window when the series already existed 7 days ago, and the whole value when it appeared inside the window. If Alloy restarts within the window, the counter resets and is undercounted, never overcounted. That limitation is documented. Verified in task 4.4: all five reasons are reported with their exact counts.
 
 ### D7. Grafana: Loki datasource and Transactions dashboard
 The datasource file gains a Loki entry: `uid: loki`, `url: http://loki:3100`, `jsonData.maxLines: 5000`. It is not the default.
