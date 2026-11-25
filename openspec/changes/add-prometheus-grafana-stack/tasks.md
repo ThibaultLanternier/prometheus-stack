@@ -37,7 +37,7 @@
 
 - [x] 6.1 Implement `scripts/smoke-test.sh` per D9 (isolated project name, alternate ports, temp `IMPORT_DIR`, good + no-EOF + ms-timestamp fixtures, assertions on exit code, folders, query within 120 s, Grafana datasource health, idempotent re-run, `down -v` trap); verify it exits 0 on a clean machine and leaves no `prom-smoke` containers or volumes behind
 - [x] 6.2 Verify the smoke test does not touch the user's stack: run it while the main stack is up and confirm the main stack's data and `./import` folder are unchanged
-- [ ] 6.3 Add a README "Testing" section describing `scripts/smoke-test.sh`
+- [x] 6.3 Add a README "Testing" section describing `scripts/smoke-test.sh`
 
 ## 7. Lint
 

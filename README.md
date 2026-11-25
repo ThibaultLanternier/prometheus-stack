@@ -150,3 +150,26 @@ docker compose down -v
 ```
 
 Files in `./import/` are left untouched either way.
+
+## Testing
+
+`scripts/smoke-test.sh` checks the whole path end to end:
+
+```sh
+scripts/smoke-test.sh
+```
+
+It starts a separate copy of the stack (compose project `prom-smoke`, ports
+19090 and 13000) with its own temporary import folder, ignoring your `.env`.
+It imports the sample file plus two invalid files (no `# EOF`, millisecond
+timestamps), then checks:
+
+- the importer exits non-zero and routes each file to `processed/` or `failed/`;
+- a sample value is queryable in Prometheus within 120 seconds;
+- Grafana's Prometheus datasource reports healthy;
+- a second import run finds nothing to do.
+
+It removes its containers, volumes and temporary folder on exit, and can run
+while your own stack is up without touching its data or `./import/`. It takes
+about a minute and exits non-zero if any check fails. If ports 19090 or 13000
+are taken, set `SMOKE_PROMETHEUS_PORT` / `SMOKE_GRAFANA_PORT`.
