@@ -88,3 +88,65 @@ Two fixes:
 - Set `PROMETHEUS_LOOKBACK_DELTA` in `.env` to at least your sampling interval
   (e.g. `1h`), then run `docker compose up -d`.
 - Or, per query, wrap the series: `last_over_time(my_metric[1h])`.
+
+## Importing data
+
+1. Put one or more `.om` files in `./import/` (or the folder set by `IMPORT_DIR`).
+2. With the stack running, run:
+
+   ```sh
+   docker compose run --rm importer
+   ```
+
+To try it out with the bundled sample:
+
+```sh
+cp examples/sample.om import/
+docker compose run --rm importer
+```
+
+Then open the **Sample import** dashboard in Grafana.
+
+What happens:
+
+- Every `.om` file in `./import/` is checked and converted with
+  `promtool tsdb create-blocks-from openmetrics`. Prometheus and Grafana keep
+  running throughout.
+- Imported files move to `./import/processed/`, so running the importer again
+  never imports them twice.
+- Files that fail move to `./import/failed/`, and the reason is printed. The
+  importer carries on with the remaining files, then exits with a non-zero
+  status. A failed file adds no data. Fix it, move it back to `./import/` and
+  run the importer again.
+- With no pending files, it prints `Nothing to import` and exits successfully.
+- If a file with the same name is already in `processed/` or `failed/`, the new
+  one gets a timestamp prefix instead of overwriting it.
+
+Imported data becomes queryable within about a minute, without a restart:
+Prometheus picks up the new blocks on its periodic reload. If it does not show
+up after two minutes, restart Prometheus:
+
+```sh
+docker compose restart prometheus
+```
+
+Importing a time range that is already stored creates overlapping blocks,
+which Prometheus merges. Where two samples of a series share a timestamp, only
+one is kept, so you cannot tell which value wins. To replace data you already
+imported, reset the stack and import again.
+
+## Resetting
+
+Stop the stack and keep all data:
+
+```sh
+docker compose down
+```
+
+Delete all stored time series **and** Grafana state (users, settings):
+
+```sh
+docker compose down -v
+```
+
+Files in `./import/` are left untouched either way.
