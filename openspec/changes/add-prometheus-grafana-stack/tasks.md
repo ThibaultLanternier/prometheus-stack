@@ -30,7 +30,7 @@
 - [x] 5.2 Implement the import loop (D4/D5: clean leftover staging, run promtool into `.staging/<run-id>`, chown to 65534, atomic `mv` into `/prometheus`, move file to `processed/` or `failed/`, print errors, keep going, "nothing to import" message, non-zero exit if any file failed)
 - [x] 5.3 Add the `importer` service (profile `import`, same image tag, `user: "0:0"`, D2 mounts); verify `docker compose up -d` does not start it and `docker compose run --rm importer` with `examples/sample.om` copied into `import/` moves the file to `processed/`
 - [x] 5.4 Verify the queryable bound: within 2 minutes of 5.3, `curl 'localhost:9090/api/v1/query?query=<sample_metric>&time=<sample_ts>'` returns the sample value without restarting Prometheus, and the sample dashboard shows the data. If not, apply the D-risk fallback (print a restart hint) and document it
-- [ ] 5.5 Verify persistence: after `docker compose down && docker compose up -d`, the 5.4 query still returns the value
+- [x] 5.5 Verify persistence: after `docker compose down && docker compose up -d`, the 5.4 query still returns the value
 - [ ] 5.6 Write the README sections "Importing data" (command, folders, failure handling, restart fallback) and "Resetting" (`down -v`), and verify each documented command runs as written
 
 ## 6. End-to-end smoke test
