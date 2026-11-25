@@ -16,18 +16,18 @@ loki.source.file "transactions" {
 loki.process "transactions" {
   forward_to = [loki.write.loki.receiver]
 
+  // 1. Parse the line. A line that is not a JSON object yields no fields and
+  //    is dropped by the missing-field rules below, so it is counted too
+  //    (drop_malformed would drop it without counting it).
   stage.json {
     expressions = {
-      date    = "",
-      account = "",
-      type    = "",
+      id          = "",
+      date        = "",
+      account     = "",
+      type        = "",
+      amount      = "",
+      description = "",
     }
-  }
-
-  stage.timestamp {
-    source           = "date"
-    format           = "2006-01-02"
-    fallback_formats = ["RFC3339Nano", "RFC3339"]
   }
 
   stage.static_labels {
@@ -36,6 +36,92 @@ loki.process "transactions" {
     }
   }
 
+  // 2. Copy every field into a temporary tx_* label so that the match stages
+  //    below can drop lines whose value does NOT match a rule (negative
+  //    regex), which plain drop stages cannot express. A missing or empty
+  //    field gives an absent label. All tx_* labels are removed in step 5.
+  stage.labels {
+    values = {
+      tx_id          = "id",
+      tx_date        = "date",
+      tx_account     = "account",
+      tx_type        = "type",
+      tx_amount      = "amount",
+      tx_description = "description",
+    }
+  }
+
+  // 3. Validation: each rule drops the line and counts it under a reason
+  //    (loki_process_dropped_lines_total{reason=...}).
+  stage.match {
+    selector            = "{job=\"transactions\", tx_id!~\".+\"}"
+    action              = "drop"
+    drop_counter_reason = "malformed_or_missing_field"
+  }
+  stage.match {
+    selector            = "{job=\"transactions\", tx_date!~\".+\"}"
+    action              = "drop"
+    drop_counter_reason = "malformed_or_missing_field"
+  }
+  stage.match {
+    selector            = "{job=\"transactions\", tx_account!~\".+\"}"
+    action              = "drop"
+    drop_counter_reason = "malformed_or_missing_field"
+  }
+  stage.match {
+    selector            = "{job=\"transactions\", tx_type!~\".+\"}"
+    action              = "drop"
+    drop_counter_reason = "malformed_or_missing_field"
+  }
+  stage.match {
+    selector            = "{job=\"transactions\", tx_amount!~\".+\"}"
+    action              = "drop"
+    drop_counter_reason = "malformed_or_missing_field"
+  }
+  stage.match {
+    selector            = "{job=\"transactions\", tx_description!~\".+\"}"
+    action              = "drop"
+    drop_counter_reason = "malformed_or_missing_field"
+  }
+
+  // date: a real calendar date YYYY-MM-DD (1900-2099, leap years included),
+  // optionally followed by a time with a mandatory UTC offset. Checking real
+  // dates here matters: stage.timestamp cannot drop a line it fails to parse,
+  // it would store it at a wrong time instead.
+  stage.match {
+    selector            = "{job=\"transactions\", tx_date!~\"((19|20)[0-9]{2}-((0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-8])|(0[13-9]|1[0-2])-(29|30)|(0[13578]|1[02])-31)|(19([2468][048]|[13579][26]|0[48])|20([02468][048]|[13579][26]))-02-29)(T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,9})?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9]))?\"}"
+    action              = "drop"
+    drop_counter_reason = "invalid_date"
+  }
+
+  // account: a short readable name, never an account number or an IBAN.
+  stage.match {
+    selector            = "{job=\"transactions\", tx_account!~\"[a-z][a-z0-9_-]{0,63}\"}"
+    action              = "drop"
+    drop_counter_reason = "invalid_account"
+  }
+  stage.match {
+    selector            = "{job=\"transactions\", tx_account=~\".*[0-9]{6,}.*\"}"
+    action              = "drop"
+    drop_counter_reason = "invalid_account"
+  }
+
+  stage.match {
+    selector            = "{job=\"transactions\", tx_type!~\"[A-Z][A-Z0-9_]{0,31}\"}"
+    action              = "drop"
+    drop_counter_reason = "invalid_type"
+  }
+
+  // 4. Timestamp from date. Every remaining date is valid (step 3).
+  //    Dates more than 1 day ahead are rejected by Loki (too_far_in_future).
+  stage.timestamp {
+    source           = "date"
+    format           = "2006-01-02"
+    fallback_formats = ["RFC3339Nano", "RFC3339"]
+  }
+
+  // 5. Final labels: job (above), account and type. Temporary labels and the
+  //    filename label added by loki.source.file are removed.
   stage.labels {
     values = {
       account = "",
@@ -44,7 +130,15 @@ loki.process "transactions" {
   }
 
   stage.label_drop {
-    values = ["filename"]
+    values = [
+      "filename",
+      "tx_id",
+      "tx_date",
+      "tx_account",
+      "tx_type",
+      "tx_amount",
+      "tx_description",
+    ]
   }
 }
 

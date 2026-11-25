@@ -123,10 +123,11 @@ loki.source.file "transactions"  tail_from_end = false (new files read from the 
         |
 loki.process "transactions"
    1. stage.json       extract id, date, account, type, amount, description;
-                       malformed lines dropped (reason malformed_json)
+                       a malformed line yields no fields (drop_malformed off,
+                       since it would drop without counting)
    2. stage.labels     copy every extracted field into a TEMPORARY label (tx_*)
    3. stage.match x N  selectors with negative regexes, action "drop", one reason each:
-                         {tx_id!~".+"} / {tx_amount!~".+"} / ...      -> missing_field
+                         {tx_id!~".+"} / {tx_amount!~".+"} / ...      -> malformed_or_missing_field
                          {tx_date!~"<YYYY-MM-DD | RFC 3339 w/ offset>"} -> invalid_date
                          {tx_account!~"^[a-z][a-z0-9_-]{0,63}$"}      -> invalid_account
                          {tx_account=~".*[0-9]{6,}.*"}                 -> invalid_account
@@ -148,6 +149,16 @@ The line is never rewritten. It reaches Loki byte for byte as it is in the file,
 `stage.drop` would need a positive "is invalid" regex for every rule, and RE2 has no negative lookahead. The temporary labels never leave Alloy, because step 7 removes them.
 
 **Future dates:** Alloy has no "newer than" drop. Loki enforces this instead: `creation_grace_period` is 25h, and Loki discards such entries with reason `too_far_in_future`, counted in `loki_discarded_samples_total`. A rejected entry does not block the other entries of the same push, and Task 2.3 checks this.
+
+**Calendar dates:** the `invalid_date` regex accepts only real dates from 1900 to 2099, leap years included. `stage.timestamp` cannot drop a line it fails to parse: on failure it reuses the previous timestamp, or the time the line was read. So a format-only regex would let `2025-02-30` be stored at a wrong time.
+
+**Spike results (task 3.2):**
+- Fixture: 23 lines, 6 valid and 17 invalid, one per drop case.
+- **Stored:** exactly the 6 valid lines, at the expected UTC instants (date-only, `+01:00` offset, fractional `Z`, 2024-02-29), with labels `job`, `account` and `type` only.
+- **Dropped:** malformed_or_missing_field 9, invalid_date 4, invalid_account 3, invalid_type 1.
+- **Two findings, both fixed:**
+  - `drop_malformed = true` dropped lines without counting them;
+  - selectors reject backtick strings, so regex dots are written `[.]`.
 
 *Alternatives:*
 - `stage.regex` with named groups plus `stage.drop`: drops can't be expressed when a group is absent.

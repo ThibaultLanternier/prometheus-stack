@@ -28,7 +28,7 @@
 - [x] 3.1 Add the `alloy` service (D4: pinned tag, command with storage path and `0.0.0.0:12345` listen address, read-only config and import mounts, `alloy-data` volume, `127.0.0.1:${ALLOY_PORT:-12345}` port, `depends_on` loki started) with a minimal `alloy/config.alloy` (file match, file source, `json` stage, three labels, `filename` label dropped, timestamp, write). Verify:
   - `docker compose up -d` starts it and `curl -s localhost:12345/-/ready` succeeds;
   - a one-line valid file copied into `import-transactions/` is queryable in Loki within 60 s, at its `date`, with exactly the labels `job`, `account` and `type`.
-- [ ] 3.2 Pipeline spike, then the validation stages (D5 steps 2, 3 and 7). Build a fixture file with:
+- [x] 3.2 Pipeline spike, then the validation stages (D5 steps 2, 3 and 7). Build a fixture file with:
   - valid lines: date-only, date-time with offset, and two lines identical except for `id`;
   - one line per drop reason: malformed JSON, each missing field, invalid date, naive date-time, account number, IBAN-like account, bad type.
 
