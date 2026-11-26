@@ -1,8 +1,13 @@
 # prometheus-stack
 
-A local Prometheus + Grafana stack for exploring your own historical time series.
-Data is not scraped: you write it as OpenMetrics text files and backfill them
-into Prometheus with a single command.
+A local Prometheus + Loki + Grafana stack for exploring your own historical data:
+
+- **Time series** (e.g. daily account balances): you write them as OpenMetrics
+  text files and backfill them into Prometheus with a single command.
+- **Bank transactions**: Loki stores them as log lines, so they can be filtered
+  by label and searched by text in Grafana. The stack provides Loki and its
+  Grafana datasource; getting transactions into Loki is not part of it yet (see
+  [Loki](#loki)).
 
 ## Requirements
 
@@ -15,11 +20,22 @@ cp .env.example .env          # then set GF_SECURITY_ADMIN_PASSWORD
 docker compose up -d
 ```
 
-- Prometheus: <http://localhost:9090>
 - Grafana: <http://localhost:3000> (log in with the credentials from `.env`)
+- Prometheus: <http://localhost:9090>
+- Loki API: <http://localhost:3100> (ready when `curl localhost:3100/ready` prints `ready`)
 
-Both ports are bound to `127.0.0.1` only, so other machines on your network
-cannot reach them.
+All ports are bound to `127.0.0.1` only, so other machines on your network
+cannot reach them. Loki has no Docker healthcheck (its image ships no shell or
+HTTP client), so `docker compose ps` shows no health status for it: use the
+URL above.
+
+### Upgrading an existing stack
+
+After pulling a new version, run `docker compose up -d`, then
+`docker compose restart prometheus grafana`. Prometheus and Grafana read their
+configuration and provisioning only at startup, and `up -d` does not restart
+them when only those files changed. The first `up -d` after this version adds
+Loki; the Grafana restart is what makes its datasource appear.
 
 ### Configuration (`.env`)
 
@@ -31,7 +47,9 @@ cannot reach them.
 | `GRAFANA_PORT` | `3000` | Host port for Grafana |
 | `GF_SECURITY_ADMIN_USER` | `admin` | Grafana admin user |
 | `GF_SECURITY_ADMIN_PASSWORD` | `admin` | Grafana admin password |
-| `IMPORT_DIR` | `./import` | Folder the importer reads from |
+| `IMPORT_DIR` | `./import` | Folder the metrics importer reads from |
+| `LOKI_PORT` | `3100` | Host port for Loki |
+| `LOKI_RETENTION` | `10y` | How long Loki keeps entries (e.g. `5y`, `8760h`) |
 
 Grafana reads the admin credentials only when its data volume is first
 created. To change them later, use the Grafana UI or reset the stack.
@@ -135,6 +153,37 @@ which Prometheus merges. Where two samples of a series share a timestamp, only
 one is kept, so you cannot tell which value wins. To replace data you already
 imported, reset the stack and import again.
 
+## Loki
+
+Loki is the store for bank transactions. This stack runs it and connects it to
+Grafana; the tooling that sends transactions to it is not included yet.
+
+Anything that speaks Loki's standard push API can write to it:
+`POST http://localhost:3100/loki/api/v1/push` (JSON or protobuf, no
+authentication). For example:
+
+```sh
+now=$(date +%s)000000000
+curl -s -H 'Content-Type: application/json' localhost:3100/loki/api/v1/push \
+  --data '{"streams":[{"stream":{"job":"demo"},"values":[["'"$now"'","hello loki"]]}]}'
+```
+
+Then open **Explore** in Grafana, pick the **Loki** datasource and run
+`{job="demo"}`.
+
+Loki is configured for historical data rather than live logs:
+
+- **Any age is accepted.** Entries dated years ago are stored, and older entries
+  can arrive after newer ones in the same stream, even after a restart.
+- **Entries more than one day in the future are rejected** (HTTP 400 for those
+  entries; the others in the same push are stored).
+- **Entries are kept for `LOKI_RETENTION`** (10 years by default), and a query
+  can span that whole period.
+- **Re-sending is harmless.** An entry with the same labels, timestamp and line
+  as a stored one is dropped, so it is never stored twice.
+- **Loki adds no labels of its own.** A stream has exactly the labels the
+  sender set.
+
 ## Resetting
 
 Stop the stack and keep all data:
@@ -143,7 +192,8 @@ Stop the stack and keep all data:
 docker compose down
 ```
 
-Delete all stored time series **and** Grafana state (users, settings):
+Delete all stored time series, Loki entries **and** Grafana state (users,
+settings):
 
 ```sh
 docker compose down -v
@@ -160,16 +210,19 @@ scripts/smoke-test.sh
 ```
 
 It starts a separate copy of the stack (compose project `prom-smoke`, ports
-19090 and 13000) with its own temporary import folder, ignoring your `.env`.
+19090, 13000 and 13100) with its own temporary import folder, ignoring your `.env`.
 It imports the sample file plus two invalid files (no `# EOF`, millisecond
 timestamps), then checks:
 
 - the importer exits non-zero and routes each file to `processed/` or `failed/`;
 - a sample value is queryable in Prometheus within 120 seconds;
 - Grafana's Prometheus datasource reports healthy;
+- Loki reports ready within 60 seconds and Grafana's Loki datasource reports
+  healthy (no data is sent to Loki);
 - a second import run finds nothing to do.
 
 It removes its containers, volumes and temporary folder on exit, and can run
 while your own stack is up without touching its data or `./import/`. It takes
-about a minute and exits non-zero if any check fails. If ports 19090 or 13000
-are taken, set `SMOKE_PROMETHEUS_PORT` / `SMOKE_GRAFANA_PORT`.
+about a minute and exits non-zero if any check fails. If ports 19090, 13000 or
+13100 are taken, set `SMOKE_PROMETHEUS_PORT` / `SMOKE_GRAFANA_PORT` /
+`SMOKE_LOKI_PORT`.
