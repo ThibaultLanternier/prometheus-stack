@@ -33,7 +33,7 @@ Already implemented on this branch, now out of scope (see proposal Impact).
 
 - [x] 4.1 Remove the Alloy service and its `alloy-data` volume from `docker-compose.yml`, plus `alloy/`, `import-transactions/`, the `import-transactions/*.jsonl` line in `.gitignore`, and `ALLOY_PORT` and `IMPORT_TRANSACTIONS_DIR` in `.env.example`; verify `docker compose config -q` passes and `grep -rniE "alloy|import-transactions" --exclude-dir=openspec --exclude-dir=.git .` finds nothing
 - [x] 4.2 Remove the `loki` and `alloy` scrape jobs from `prometheus/prometheus.yml`; verify `promtool check config` passes and, after `docker compose restart prometheus`, `/api/v1/targets` lists neither
-- [ ] 4.3 Remove `grafana/dashboards/transactions.json` and `examples/transactions.jsonl`; verify the dashboard is gone from `/api/search` after `docker compose restart grafana`
+- [x] 4.3 Remove `grafana/dashboards/transactions.json` and `examples/transactions.jsonl`; verify the dashboard is gone from `/api/search` after `docker compose restart grafana`
 - [x] 4.4 Discard the uncommitted transaction smoke-test work (`scripts/smoke-test.sh` changes and `scripts/fixtures/`)
 
 ## 5. Documentation, smoke test and lint
