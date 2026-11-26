@@ -38,7 +38,7 @@ Already implemented on this branch, now out of scope (see proposal Impact).
 
 ## 5. Documentation, smoke test and lint
 
-- [ ] 5.1 Rewrite the README for Loki only:
+- [x] 5.1 Rewrite the README for Loki only:
   - intro: Loki is the store for transactions, ingestion comes later;
   - remove "Transactions: file format" and "Ingesting transactions";
   - "Quick start": the Loki URL and readiness check (`curl localhost:3100/ready`);
