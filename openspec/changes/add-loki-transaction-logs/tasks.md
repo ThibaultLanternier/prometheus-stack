@@ -48,7 +48,7 @@ Already implemented on this branch, now out of scope (see proposal Impact).
 
   Verify that every documented command runs as written.
 - [x] 5.2 Extend `scripts/smoke-test.sh` per D6 (alternate Loki port, Loki `/ready` within 60 s, Grafana Loki datasource health) and update the README "Testing" section. Verify that it exits 0, leaves no `prom-smoke` containers or volumes behind, and that a main stack running at the same time keeps its data
-- [ ] 5.3 Run Loki `-verify-config`, `shellcheck` on `scripts/*.sh`, `docker compose config -q` and `promtool check config`; fix all findings and verify that all pass and the smoke test still passes
+- [x] 5.3 Run Loki `-verify-config`, `shellcheck` on `scripts/*.sh`, `docker compose config -q` and `promtool check config`; fix all findings and verify that all pass and the smoke test still passes
 
 ## Workflow follow-up
 
