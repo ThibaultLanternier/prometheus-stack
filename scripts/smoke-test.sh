@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # End-to-end smoke test: start an isolated copy of the stack, import the sample
 # file plus two invalid files, and check the data is queryable through
-# Prometheus and that Grafana's datasource works.
+# Prometheus, that Loki becomes ready and that both Grafana datasources work.
 #
 # Runs on the host. Uses its own compose project, ports and import folder, and
 # ignores .env, so it never touches the stack you use day to day. Everything it
@@ -14,6 +14,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PROJECT=prom-smoke
 QUERY_TIMEOUT=120
+LOKI_TIMEOUT=60
 # A known point of examples/sample.om: bedroom at 2024-01-15T12:00:00Z is 20.0
 QUERY='room_temperature_celsius{room="bedroom"}'
 QUERY_TIME=1705320000
@@ -21,6 +22,8 @@ EXPECTED=20
 
 export PROMETHEUS_PORT=${SMOKE_PROMETHEUS_PORT:-19090}
 export GRAFANA_PORT=${SMOKE_GRAFANA_PORT:-13000}
+export LOKI_PORT=${SMOKE_LOKI_PORT:-13100}
+export LOKI_RETENTION=10y
 export PROMETHEUS_RETENTION=10y
 export PROMETHEUS_LOOKBACK_DELTA=5m
 export GF_SECURITY_ADMIN_USER=admin
@@ -51,7 +54,7 @@ check() { # check DESCRIPTION COMMAND...
     if "$@"; then pass "$desc"; else fail "$desc"; fi
 }
 
-echo "== Starting stack (project $PROJECT, ports $PROMETHEUS_PORT/$GRAFANA_PORT)"
+echo "== Starting stack (project $PROJECT, ports $PROMETHEUS_PORT/$GRAFANA_PORT/$LOKI_PORT)"
 compose up -d --wait
 
 echo "== Preparing fixtures"
@@ -93,12 +96,32 @@ else
     fail "imported value not queryable within ${QUERY_TIMEOUT}s (got '$(query_value)')"
 fi
 
-grafana_health() {
+grafana_health() { # grafana_health DATASOURCE_UID
     curl -sf -u "$GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD" \
-        "http://localhost:$GRAFANA_PORT/api/datasources/uid/prometheus/health" |
+        "http://localhost:$GRAFANA_PORT/api/datasources/uid/$1/health" |
         grep -q '"status":"OK"'
 }
-check "Grafana datasource health is OK" grafana_health
+check "Grafana Prometheus datasource health is OK" grafana_health prometheus
+
+# Loki has no compose healthcheck (no HTTP client in its image), so
+# `up --wait` only waits for it to start: poll its readiness endpoint.
+loki_ready() {
+    [ "$(curl -s "http://localhost:$LOKI_PORT/ready")" = "ready" ]
+}
+wait_for_loki() {
+    local deadline=$((SECONDS + LOKI_TIMEOUT))
+    while [ "$SECONDS" -lt "$deadline" ]; do
+        loki_ready && return 0
+        sleep 2
+    done
+    return 1
+}
+if wait_for_loki; then
+    pass "Loki ready (limit ${LOKI_TIMEOUT}s)"
+else
+    fail "Loki not ready within ${LOKI_TIMEOUT}s"
+fi
+check "Grafana Loki datasource health is OK" grafana_health loki
 
 echo "== Second import (nothing left to do)"
 second=$(compose run --rm -T importer 2>&1) && second_status=0 || second_status=$?
